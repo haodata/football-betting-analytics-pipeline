@@ -1,5 +1,7 @@
 # Sports Betting Intelligence Platform
 
+## Live demo:https://haodata.github.io/football-betting-analytics-pipeline/
+
 Enterprise-style ELT pipeline for football/sports-betting analytics, built as a
 portfolio project targeting data engineering / sports-betting analytics roles.
 **Phase 1 (pipeline) and Phase 2 (tests/docs) are complete and verified end-to-end
@@ -9,9 +11,7 @@ Data: 50 CSVs from [football-data.co.uk](https://www.football-data.co.uk/), 5 le
 (Premier League, Bundesliga, La Liga, Serie A, Ligue 1) × 10 seasons each (2016/17
 through 2025/26) — 17,937 matches total.
 
-**Live demo:** [haodata.github.io/football-betting-analytics-pipeline/dashboard/](https://haodata.github.io/football-betting-analytics-pipeline/dashboard/)
-— standalone dashboard (`dashboard/index.html`), built on the verified numbers in
-`powerbi/Dashboard-Data-Brief.md`.
+
 
 ## Skills demonstrated
 
