@@ -134,7 +134,7 @@ Phase 1 (pipeline) ✅ and Phase 2 (tests/docs, this README) ✅ are done. Next:
   prediction, using the odds-implied-probability and rolling-form columns already
   present in `fact_matches` as features.
 - **Phase 4**: swap CSV for a live football API, same downstream architecture.
-- **Phase 5**: Cloud Scheduler automation (ingestion → dbt build → Power BI refresh).
+- **Phase 5**: Cloud Scheduler automation (ingestion → dbt build → Dashboard refresh).
 
 See root `CLAUDE.md` for the full original roadmap and layer-by-layer rules this
 project follows.
