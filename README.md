@@ -1,6 +1,6 @@
 # Sports Betting Intelligence Platform
 
-## Live demo:https://haodata.github.io/football-betting-analytics-pipeline/
+## 📌 Live demo:https://haodata.github.io/football-betting-analytics-pipeline/
 
 Enterprise-style ELT pipeline for football/sports-betting analytics, built as a
 portfolio project targeting data engineering / sports-betting analytics roles.
