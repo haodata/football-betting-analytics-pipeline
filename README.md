@@ -9,6 +9,10 @@ Data: 50 CSVs from [football-data.co.uk](https://www.football-data.co.uk/), 5 le
 (Premier League, Bundesliga, La Liga, Serie A, Ligue 1) × 10 seasons each (2016/17
 through 2025/26) — 17,937 matches total.
 
+**Live demo:** [haodata.github.io/football-betting-analytics-pipeline/dashboard/](https://haodata.github.io/football-betting-analytics-pipeline/dashboard/)
+— standalone dashboard (`dashboard/index.html`), built on the verified numbers in
+`powerbi/Dashboard-Data-Brief.md`.
+
 ## Skills demonstrated
 
 - **Cloud data warehousing**: BigQuery raw/staging/intermediate/mart layering, schema
