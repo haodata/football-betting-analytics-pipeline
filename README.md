@@ -43,7 +43,7 @@ flowchart LR
     SEED --> STG
     STG --> INT["dbt intermediate\nsbi_intermediate\nint_team_match_log -> int_team_form -> int_matches_enriched"]
     INT --> MART[("BigQuery\nsbi_mart\nfact_matches + 4 dims\n17,937 rows")]
-    MART --> BI["Power BI\n(reads sbi_mart only)"]
+    MART --> BI["Interactive dashboard \n(reads sbi_mart only)"]
 ```
 
 Verified state: `dbt run` builds all 14 models successfully; `dbt test` passes all 115
