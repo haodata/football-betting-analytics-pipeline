@@ -1,0 +1,19 @@
+version: 2
+
+seeds:
+  - name: seed_league_lookup
+    description: Lookup mapping football-data.co.uk league codes to display name and country.
+    columns:
+      - name: league_code
+        description: "Source league code, e.g. E0, D1, SP1, I1, F1."
+        data_tests:
+          - not_null
+          - unique
+      - name: league_name
+        description: "Human-readable league name, e.g. Premier League."
+        data_tests:
+          - not_null
+      - name: country
+        description: "Country the league is played in."
+        data_tests:
+          - not_null

@@ -1,0 +1,14 @@
+# Copy this to ~/.dbt/profiles.yml (NOT into the repo) and fill in your project ID.
+# Auth relies on the GOOGLE_APPLICATION_CREDENTIALS environment variable (ADC) —
+# no service-account keyfile path is ever written here.
+sports_betting_intelligence:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: sbi_dbt
+      threads: 4
+      location: EU
+      timeout_seconds: 300

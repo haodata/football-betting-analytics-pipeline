@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>European Football Odds &amp; Outcomes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0b0f14;color:#e6edf3;font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:#38bdf8;text-decoration:none}
+  a:hover{color:#7dd3fc}
+  ::selection{background:#34d39944}
+  button{font-family:inherit}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState } = React;
+const el = React.createElement;
+
+/* ---------------------------------------------------------------------
+ * Verified data — queried directly from BigQuery data-engineering-501612.
+ * sbi_mart on 2026-07-17. See ../powerbi/Dashboard-Data-Brief.md for the
+ * exact queries these numbers came from. Do not hand-edit these values;
+ * re-run the queries in the brief if the mart changes.
+ * ------------------------------------------------------------------- */
+const OVERALL = {
+  matches: 17937, goals: 50106, avgGoals: 2.79,
+  homeWin: 44.04, awayWin: 30.95, draw: 25.01,
+  homeCount: 7900, awayCount: 5551, drawCount: 4486,
+  btts: 53.70, over25: 53.09, overround: 5.24,
+};
+
+const LEAGUES = [
+  { name: 'Bundesliga',      country: 'Germany', matches: 3060, goals: 9474,  avgGoals: 3.096, homeWin: 44.22, overround: 5.38, color: '#38bdf8' },
+  { name: 'Premier League',  country: 'England', matches: 3800, goals: 10773, avgGoals: 2.835, homeWin: 44.63, overround: 4.68, color: '#34d399' },
+  { name: 'Serie A',         country: 'Italy',   matches: 3800, goals: 10423, avgGoals: 2.743, homeWin: 41.95, overround: 5.40, color: '#a78bfa' },
+  { name: 'Ligue 1',         country: 'France',  matches: 3477, goals: 9486,  avgGoals: 2.728, homeWin: 43.95, overround: 5.37, color: '#f472b6' },
+  { name: 'La Liga',         country: 'Spain',   matches: 3800, goals: 9950,  avgGoals: 2.618, homeWin: 45.50, overround: 5.43, color: '#fbbf24' },
+];
+
+const SEASONS = [
+  { season: '2016/2017', matches: 1826, goals: 5176, avgGoals: 2.835, homeWin: 48.63, overround: 4.64 },
+  { season: '2017/2018', matches: 1826, goals: 4947, avgGoals: 2.709, homeWin: 45.35, overround: 4.77 },
+  { season: '2018/2019', matches: 1826, goals: 5019, avgGoals: 2.749, homeWin: 44.74, overround: 4.74 },
+  { season: '2019/2020', matches: 1504, goals: 4177, avgGoals: 2.777, homeWin: 44.02, overround: 5.35 },
+  { season: '2020/2021', matches: 2047, goals: 5753, avgGoals: 2.810, homeWin: 40.40, overround: 5.63 },
+  { season: '2021/2022', matches: 1826, goals: 5132, avgGoals: 2.811, homeWin: 42.77, overround: 5.43 },
+  { season: '2022/2023', matches: 1826, goals: 5051, avgGoals: 2.766, homeWin: 45.73, overround: 5.38 },
+  { season: '2023/2024', matches: 1752, goals: 5054, avgGoals: 2.885, homeWin: 43.09, overround: 5.39 },
+  { season: '2024/2025', matches: 1752, goals: 4953, avgGoals: 2.827, homeWin: 42.01, overround: 5.56 },
+  { season: '2025/2026', matches: 1752, goals: 4844, avgGoals: 2.765, homeWin: 44.01, overround: 5.56 },
+];
+
+const TEAMS = [
+  { name: 'Bayern Munich', matches: 340, goals: 972 },
+  { name: 'Man City',      matches: 380, goals: 904 },
+  { name: 'Barcelona',     matches: 380, goals: 890 },
+  { name: 'Paris SG',      matches: 357, goals: 883 },
+  { name: 'Liverpool',     matches: 380, goals: 808 },
+  { name: 'Real Madrid',   matches: 380, goals: 797 },
+  { name: 'Inter',         matches: 380, goals: 777 },
+  { name: 'Dortmund',      matches: 340, goals: 753 },
+  { name: 'Atalanta',      matches: 380, goals: 716 },
+  { name: 'Napoli',        matches: 380, goals: 715 },
+];
+
+const LEAGUE_METRICS = {
+  avgGoals:  { label: 'Goals/match', fmt: v => v.toFixed(3) },
+  homeWin:   { label: 'Home win %',  fmt: v => v.toFixed(2) + '%' },
+  overround: { label: 'Overround',   fmt: v => v.toFixed(2) + '%' },
+  matches:   { label: 'Matches',     fmt: v => v.toLocaleString('en-US') },
+};
+const SEASON_METRICS = {
+  homeWin:   { label: 'Home win %',  fmt: v => v.toFixed(2) + '%', color: '#34d399' },
+  avgGoals:  { label: 'Goals/match', fmt: v => v.toFixed(3),       color: '#38bdf8' },
+  overround: { label: 'Overround',   fmt: v => v.toFixed(2) + '%', color: '#fbbf24' },
+  matches:   { label: 'Matches',     fmt: v => v.toLocaleString('en-US'), color: '#a78bfa' },
+};
+const SEASON_NOTES = {
+  homeWin: 'Home advantage drifts down over the decade — 48.6% in 2016/17 to the low-40s recently, a real structural trend worth pricing into home-side markets.',
+  avgGoals: 'Scoring holds around 2.75–2.9 goals/match with 2023/24 the most prolific; the totals market has stayed remarkably stable.',
+  overround: 'Bookmaker margin steps up from ~4.6% pre-2019 to ~5.6% recently — tighter pricing discipline, a larger built-in edge.',
+  matches: 'Season sizes vary: 2019/20 (1,504) was COVID-shortened; 2020/21 (2,047) absorbed the fixture backlog; 2023/24 onward reflects league team-count changes.',
+};
+
+const n = v => v.toLocaleString('en-US');
+
+function tabStyle(active) {
+  return {
+    border: 'none', cursor: 'pointer', background: active ? '#1c2a37' : 'transparent',
+    color: active ? '#f2f6fa' : '#8b97a5', fontFamily: "'Space Grotesk',sans-serif",
+    fontWeight: active ? 600 : 500, fontSize: 14, padding: '9px 18px', borderRadius: 8,
+  };
+}
+function pillStyle(active) {
+  return {
+    border: 'none', cursor: 'pointer', background: active ? '#24303c' : 'transparent',
+    color: active ? '#e6edf3' : '#8b97a5', fontFamily: "'IBM Plex Mono',monospace",
+    fontWeight: 500, fontSize: 12, padding: '6px 12px', borderRadius: 6,
+  };
+}
+function thStyle(active) {
+  return { textAlign: 'right', padding: '12px 14px', fontWeight: 500, cursor: 'pointer', color: active ? '#e6edf3' : '#8b97a5', userSelect: 'none' };
+}
+
+function Donut() {
+  const C = 2 * Math.PI * 62;
+  const segs = [
+    { v: OVERALL.homeWin, color: '#34d399' },
+    { v: OVERALL.awayWin, color: '#38bdf8' },
+    { v: OVERALL.draw,    color: '#fbbf24' },
+  ];
+  let acc = 0;
+  const circles = segs.map((s, i) => {
+    const dash = (s.v / 100) * C, off = -(acc / 100) * C;
+    acc += s.v;
+    return el('circle', { key: i, cx: 90, cy: 90, r: 62, fill: 'none', stroke: s.color, strokeWidth: 24, strokeDasharray: `${dash} ${C - dash}`, strokeDashoffset: off });
+  });
+  return el('svg', { viewBox: '0 0 180 180', width: 190, height: 190 },
+    el('g', { transform: 'rotate(-90 90 90)' }, circles),
+    el('text', { x: 90, y: 84, textAnchor: 'middle', fill: '#f2f6fa', style: { font: "600 24px 'IBM Plex Mono',monospace" } }, n(OVERALL.matches)),
+    el('text', { x: 90, y: 104, textAnchor: 'middle', fill: '#8b97a5', style: { font: "12px 'IBM Plex Sans',sans-serif" } }, 'matches')
+  );
+}
+
+function LineChart({ metricKey }) {
+  const def = SEASON_METRICS[metricKey];
+  const W = 680, H = 270, pl = 52, pr = 18, pt = 22, pb = 42;
+  const vals = SEASONS.map(d => d[metricKey]);
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  const pad = (hi - lo) * 0.18 || 1;
+  lo -= pad; hi += pad;
+  const x = i => pl + i * (W - pl - pr) / (SEASONS.length - 1);
+  const y = v => pt + (1 - (v - lo) / (hi - lo)) * (H - pt - pb);
+  const pts = SEASONS.map((d, i) => [x(i), y(d[metricKey])]);
+  const path = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const area = path + ` L${x(SEASONS.length - 1).toFixed(1)} ${H - pb} L${pl} ${H - pb} Z`;
+  const ticks = [0, 1, 2, 3, 4].map(t => { const v = lo + (hi - lo) * t / 4; return { v, y: y(v) }; });
+
+  return el('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', style: { maxWidth: W, display: 'block' } },
+    el('defs', null, el('linearGradient', { id: 'lg', x1: 0, y1: 0, x2: 0, y2: 1 },
+      el('stop', { offset: '0%', stopColor: def.color, stopOpacity: 0.28 }),
+      el('stop', { offset: '100%', stopColor: def.color, stopOpacity: 0 }))),
+    ticks.map((t, i) => el('g', { key: 't' + i },
+      el('line', { x1: pl, x2: W - pr, y1: t.y, y2: t.y, stroke: '#1c2530', strokeWidth: 1 }),
+      el('text', { x: pl - 10, y: t.y + 4, textAnchor: 'end', fill: '#5f6c78', style: { font: "11px 'IBM Plex Mono',monospace" } }, def.fmt(t.v).replace('%', '')))),
+    el('path', { d: area, fill: 'url(#lg)' }),
+    el('path', { d: path, fill: 'none', stroke: def.color, strokeWidth: 2.5, strokeLinejoin: 'round', strokeLinecap: 'round' }),
+    pts.map((p, i) => el('circle', { key: 'p' + i, cx: p[0], cy: p[1], r: 4, fill: '#0f1620', stroke: def.color, strokeWidth: 2 },
+      el('title', null, `${SEASONS[i].season} — ${def.fmt(SEASONS[i][metricKey])}`))),
+    SEASONS.map((d, i) => el('text', { key: 'x' + i, x: x(i), y: H - 16, textAnchor: 'middle', fill: '#6b7a86', style: { font: "10.5px 'IBM Plex Mono',monospace" } }, d.season.slice(2, 4) + '/' + d.season.slice(7, 9)))
+  );
+}
+
+function Overview() {
+  const kpis = [
+    { label: 'Total matches',       value: n(OVERALL.matches),         sub: '2016–2026',      accent: '#38bdf8' },
+    { label: 'Total goals',         value: n(OVERALL.goals),           sub: 'all leagues',     accent: '#34d399' },
+    { label: 'Avg goals / match',   value: OVERALL.avgGoals.toFixed(2), sub: 'per fixture',     accent: '#34d399' },
+    { label: 'Both teams score',    value: OVERALL.btts.toFixed(1) + '%', sub: 'BTTS market',   accent: '#a78bfa' },
+    { label: 'Over 2.5 goals',      value: OVERALL.over25.toFixed(1) + '%', sub: 'totals market', accent: '#a78bfa' },
+    { label: 'Avg overround',       value: OVERALL.overround.toFixed(2) + '%', sub: 'book margin', accent: '#fbbf24' },
+  ];
+  const resultLegend = [
+    { label: 'Home win', color: '#34d399', pct: OVERALL.homeWin.toFixed(2) + '%', count: n(OVERALL.homeCount) },
+    { label: 'Away win', color: '#38bdf8', pct: OVERALL.awayWin.toFixed(2) + '%', count: n(OVERALL.awayCount) },
+    { label: 'Draw',     color: '#fbbf24', pct: OVERALL.draw.toFixed(2) + '%',    count: n(OVERALL.drawCount) },
+  ];
+  const edgeStats = [
+    { value: OVERALL.overround.toFixed(2) + '%', label: 'average overround', color: '#fbbf24' },
+    { value: (100 + OVERALL.overround).toFixed(2) + '%', label: 'implied probability sum', color: '#f2f6fa' },
+    { value: '1 / odds', label: 'implied prob. per outcome', color: '#38bdf8' },
+  ];
+  const splitBars = [
+    { label: 'Home win rate', display: OVERALL.homeWin.toFixed(2) + '%', pct: OVERALL.homeWin, color: '#34d399' },
+    { label: 'Away win rate', display: OVERALL.awayWin.toFixed(2) + '%', pct: OVERALL.awayWin, color: '#38bdf8' },
+    { label: 'Draw rate',     display: OVERALL.draw.toFixed(2) + '%',    pct: OVERALL.draw,    color: '#fbbf24' },
+  ];
+
+  return el('div', { style: { animation: 'fadeUp .35s ease both' } },
+    el('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 14 } },
+      kpis.map((k, i) => el('div', { key: i, style: { background: '#0f1620', border: '1px solid #1c2530', borderTop: `2px solid ${k.accent}`, borderRadius: 12, padding: '16px 15px' } },
+        el('div', { style: { fontSize: 11.5, letterSpacing: '.04em', color: '#8b97a5', textTransform: 'uppercase', minHeight: 28 } }, k.label),
+        el('div', { style: { fontFamily: "'IBM Plex Mono',monospace", fontWeight: 600, fontSize: 26, marginTop: 8, color: '#f2f6fa' } }, k.value),
+        el('div', { style: { fontSize: 12, color: '#6b7a86', marginTop: 3, fontFamily: "'IBM Plex Mono',monospace" } }, k.sub)
+      ))
+    ),
+    el('div', { style: { display: 'grid', gridTemplateColumns: '340px 1fr', gap: 16, marginTop: 16 } },
+      el('div', { style: { background: '#0f1620', border: '1px solid #1c2530', borderRadius: 14, padding: 20 } },
+        el('div', { style: { fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: 16, marginBottom: 2 } }, 'Match result distribution'),
+        el('div', { style: { fontSize: 12.5, color: '#8b97a5', marginBottom: 8 } }, 'Full-time outcome, all leagues & seasons'),
+        el('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 0' } }, el(Donut)),
+        el('div', { style: { display: 'flex', flexDirection: 'column', gap: 9, marginTop: 6 } },
+          resultLegend.map((r, i) => el('div', { key: i, style: { display: 'flex', alignItems: 'center', gap: 10 } },
+            el('span', { style: { width: 11, height: 11, borderRadius: 3, background: r.color } }),
+            el('span', { style: { flex: 1, fontSize: 13.5, color: '#c9d4de' } }, r.label),
+            el('span', { style: { fontFamily: "'IBM Plex Mono',monospace", fontSize: 13.5, color: '#f2f6fa' } }, r.pct),
+            el('span', { style: { fontFamily: "'IBM Plex Mono',monospace", fontSize: 12, color: '#6b7a86', width: 64, textAlign: 'right' } }, r.count)
+          ))
+        )
+      ),
+      el('div', { style: { display: 'flex', flexDirection: 'column', gap: 16 } },
+        el('div', { style: { background: 'linear-gradient(120deg,#12202b,#0f1620)', border: '1px solid #24303c', borderRadius: 14, padding: '20px 22px' } },
+          el('div', { style: { fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: 16 } }, "The bookmaker's edge"),
+          el('div', { style: { fontSize: 13, color: '#8b97a5', marginTop: 3, maxWidth: 560, lineHeight: 1.5 } }, 'Across every priced market the three Bet365 outcome probabilities sum to more than 100% — that surplus is the overround, the margin baked into the price.'),
+          el('div', { style: { display: 'flex', gap: 26, marginTop: 18, flexWrap: 'wrap' } },
+            edgeStats.map((e, i) => el('div', { key: i },
+              el('div', { style: { fontFamily: "'IBM Plex Mono',monospace", fontWeight: 600, fontSize: 30, color: e.color } }, e.value),
+              el('div', { style: { fontSize: 12, color: '#8b97a5', marginTop: 2 } }, e.label)
+            ))
+          )
+        ),
+        el('div', { style: { background: '#0f1620', border: '1px solid #1c2530', borderRadius: 14, padding: '20px 22px', flex: 1 } },
+          el('div', { style: { fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: 16, marginBottom: 14 } }, 'Home advantage vs the market'),
+          el('div', { style: { display: 'flex', flexDirection: 'column', gap: 14 } },
+            splitBars.map((b, i) => el('div', { key: i },
+              el('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 5 } },
+                el('span', { style: { color: '#c9d4de' } }, b.label),
+                el('span', { style: { fontFamily: "'IBM Plex Mono',monospace", color: '#f2f6fa' } }, b.display)),
+              el('div', { style: { height: 9, background: '#141c26', borderRadius: 5, overflow: 'hidden' } },
+                el('div', { style: { height: '100%', width: b.pct + '%', background: b.color, borderRadius: 5 } }))
+            ))
+          )
+        )
+      )
+    )
+  );
+}
+
+function Leagues() {
+  const [metric, setMetric] = useState('avgGoals');
+  const def = LEAGUE_METRICS[metric];
+  const max = Math.max(...LEAGUES.map(l => l[metric]));
+  const sorted = [...LEAGUES].sort((a, b) => b[metric] - a[metric]);
+
+  return el('div', { style: { animation: 'fadeUp .35s ease both' } },
+    el('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 16 } },
+      el('div', null,
+        el('div', { style: { fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: 18 } }, 'By league'),
+        el('div', { style: { fontSize: 13, color: '#8b97a5' } }, 'Ranked on the selected metric')
+      ),
+      el('div', { style: { display: 'flex', gap: 5, background: '#0f1620', border: '1px solid #1c2530', borderRadius: 9, padding: 4 } },
+        Object.keys(LEAGUE_METRICS).map(k => el('button', { key: k, style: pillStyle(metric === k), onClick: () => setMetric(k) }, LEAGUE_METRICS[k].label))
+      )
+    ),
+    el('div', { style: { background: '#0f1620', border: '1px solid #1c2530', borderRadius: 14, padding: 22 } },
+      el('div', { style: { display: 'flex', flexDirection: 'column', gap: 16 } },
+        sorted.map((l, i) => el('div', { key: i, title: `${l.name}: ${def.fmt(l[metric])}`, style: { display: 'grid', gridTemplateColumns: '150px 1fr 76px', alignItems: 'center', gap: 14 } },
+          el('div', null,
+            el('div', { style: { fontSize: 14, color: '#e6edf3', fontWeight: 500 } }, l.name),
+            el('div', { style: { fontSize: 11.5, color: '#6b7a86' } }, l.country)),
+          el('div', { style: { height: 22, background: '#141c26', borderRadius: 6, overflow: 'hidden' } },
+            el('div', { style: { height: '100%', width: (l[metric] / max * 100) + '%', background: `linear-gradient(90deg,#0f766e,${l.color})`, borderRadius: 6 } })),
+          el('div', { style: { fontFamily: "'IBM Plex Mono',monospace", fontSize: 14, textAlign: 'right', color: '#f2f6fa' } }, def.fmt(l[metric]))
+        ))
+      )
+    ),
+    el('div', { style: { background: '#0f1620', border: '1px solid #1c2530', borderRadius: 14, padding: '6px 4px', marginTop: 16, overflowX: 'auto' } },
+      el('table', { style: { width: '100%', borderCollapse: 'collapse', fontSize: 13.5 } },
+        el('thead', null, el('tr', { style: { color: '#8b97a5', fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.04em' } },
+          ['League', 'Matches', 'Goals', 'Goals / match', 'Home win %', 'Avg overround'].map((h, i) =>
+            el('th', { key: i, style: { textAlign: i === 0 ? 'left' : 'right', padding: '12px 16px', fontWeight: 500 } }, h))
+        )),
+        el('tbody', null,
+          LEAGUES.map((l, i) => el('tr', { key: i, style: { borderTop: '1px solid #172029' } },
+            el('td', { style: { padding: '12px 16px', color: '#e6edf3' } }, el('span', { style: { color: l.color } }, '● '), l.name),
+            el('td', { style: { padding: '12px 16px', textAlign: 'right', fontFamily: "'IBM Plex Mono',monospace", color: '#c9d4de' } }, n(l.matches)),
+            el('td', { style: { padding: '12px 16px', textAlign: 'right', fontFamily: "'IBM Plex Mono',monospace", color: '#c9d4de' } }, n(l.goals)),
+            el('td', { style: { padding: '12px 16px', textAlign: 'right', fontFamily: "'IBM Plex Mono',monospace", color: '#34d399' } }, l.avgGoals.toFixed(3)),
+            el('td', { style: { padding: '12px 16px', textAlign: 'right', fontFamily: "'IBM Plex Mono',monospace", color: '#c9d4de' } }, l.homeWin.toFixed(2) + '%'),
+            el('td', { style: { padding: '12px 16px', textAlign: 'right', fontFamily: "'IBM Plex Mono',monospace", color: '#fbbf24' } }, l.overround.toFixed(2) + '%')
+          ))
+        )
+      )
+    )
+  );
+}
+
+function Seasons() {
+  const [metric, setMetric] = useState('homeWin');
+  return el('div', { style: { animation: 'fadeUp .35s ease both' } },
+    el('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 16 } },
+      el('div', null,
+        el('div', { style: { fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: 18 } }, 'Season trend'),
+        el('div', { style: { fontSize: 13, color: '#8b97a5' } }, 'Ten complete seasons')
+      ),
+      el('div', { style: { display: 'flex', gap: 5, background: '#0f1620', border: '1px solid #1c2530', borderRadius: 9, padding: 4 } },
+        Object.keys(SEASON_METRICS).map(k => el('button', { key: k, style: pillStyle(metric === k), onClick: () => setMetric(k) }, SEASON_METRICS[k].label))
+      )
+    ),
+    el('div', { style: { background: '#0f1620', border: '1px solid #1c2530', borderRadius: 14, padding: '18px 20px 8px' } }, el(LineChart, { metricKey: metric })),
+    el('p', { style: { fontSize: 12.5, color: '#6b7a86', margin: '10px 2px 18px', lineHeight: 1.5 } }, SEASON_NOTES[metric]),
+    el('div', { style: { background: '#0f1620', border: '1px solid #1c2530', borderRadius: 14, padding: '6px 4px', overflowX: 'auto' } },
+      el('table', { style: { width: '100%', borderCollapse: 'collapse', fontSize: 13.5 } },
+        el('thead', null, el('tr', { style: { color: '#8b97a5', fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.04em' } },
+          ['Season', 'Matches', 'Goals', 'Goals / match', 'Home win %', 'Avg overround'].map((h, i) =>
+            el('th', { key: i, style: { textAlign: i === 0 ? 'left' : 'right', padding: '12px 16px', fontWeight: 500 } }, h))
+        )),
+        el('tbody', null,
+          SEASONS.map((s, i) => el('tr', { key: i, style: { borderTop: '1px solid #172029' } },
+            el('td', { style: { padding: '11px 16px', color: '#e6edf3', fontFamily: "'IBM Plex Mono',monospace" } }, s.season),
+            el('td', { style: { padding: '11px 16px', textAlign: 'right', fontFamily: "'IBM Plex Mono',monospace", color: '#c9d4de' } }, n(s.matches)),
+            el('td', { style: { padding: '11px 16px', textAlign: 'right', fontFamily: "'IBM Plex Mono',monospace", color: '#c9d4de' } }, n(s.goals)),
+            el('td', { style: { padding: '11px 16px', textAlign: 'right', fontFamily: "'IBM Plex Mono',monospace", color: '#34d399' } }, s.avgGoals.toFixed(3)),
+            el('td', { style: { padding: '11px 16px', textAlign: 'right', fontFamily: "'IBM Plex Mono',monospace", color: '#c9d4de' } }, s.homeWin.toFixed(2) + '%'),
+            el('td', { style: { padding: '11px 16px', textAlign: 'right', fontFamily: "'IBM Plex Mono',monospace", color: '#fbbf24' } }, s.overround.toFixed(2) + '%')
+          ))
+        )
+      )
+    )
+  );
+}
+
+function Teams() {
+  const [sortKey, setSortKey] = useState('goals');
+  const [sortDir, setSortDir] = useState(-1);
+  const withGpm = TEAMS.map(t => ({ ...t, gpmVal: t.goals / t.matches }));
+  const max = Math.max(...withGpm.map(t => t.goals));
+  const bars = [...withGpm].sort((a, b) => b.goals - a.goals);
+  const sorted = [...withGpm].sort((a, b) => {
+    const key = sortKey === 'gpm' ? 'gpmVal' : sortKey;
+    return (a[key] - b[key]) * sortDir;
+  });
+  const toggle = k => () => { if (sortKey === k) setSortDir(d => -d); else { setSortKey(k); setSortDir(-1); } };
+  const arrow = k => sortKey === k ? (sortDir === 1 ? ' ↑' : ' ↓') : '';
+  const cols = [
+    { key: 'matches', label: 'Matches' + arrow('matches') },
+    { key: 'goals', label: 'Goals' + arrow('goals') },
+    { key: 'gpm', label: 'Goals/match' + arrow('gpm') },
+  ];
+
+  return el('div', { style: { animation: 'fadeUp .35s ease both' } },
+    el('div', { style: { marginBottom: 16 } },
+      el('div', { style: { fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: 18 } }, 'Top scoring teams'),
+      el('div', { style: { fontSize: 13, color: '#8b97a5' } }, 'All-time within this dataset · click a column header to sort')
+    ),
+    el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 } },
+      el('div', { style: { background: '#0f1620', border: '1px solid #1c2530', borderRadius: 14, padding: 20 } },
+        el('div', { style: { fontSize: 13, color: '#8b97a5', marginBottom: 14 } }, 'Goals scored'),
+        el('div', { style: { display: 'flex', flexDirection: 'column', gap: 11 } },
+          bars.map((t, i) => el('div', { key: i, style: { display: 'grid', gridTemplateColumns: '120px 1fr 44px', alignItems: 'center', gap: 12 } },
+            el('div', { style: { fontSize: 13, color: '#e6edf3', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }, t.name),
+            el('div', { style: { height: 16, background: '#141c26', borderRadius: 5, overflow: 'hidden' } },
+              el('div', { style: { height: '100%', width: (t.goals / max * 100) + '%', background: 'linear-gradient(90deg,#0f766e,#34d399)', borderRadius: 5 } })),
+            el('div', { style: { fontFamily: "'IBM Plex Mono',monospace", fontSize: 13, textAlign: 'right', color: '#f2f6fa' } }, n(t.goals))
+          ))
+        )
+      ),
+      el('div', { style: { background: '#0f1620', border: '1px solid #1c2530', borderRadius: 14, padding: '6px 4px', overflowX: 'auto' } },
+        el('table', { style: { width: '100%', borderCollapse: 'collapse', fontSize: 13.5 } },
+          el('thead', null, el('tr', { style: { color: '#8b97a5', fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.04em' } },
+            el('th', { style: { textAlign: 'left', padding: '12px 14px', fontWeight: 500 } }, '#'),
+            el('th', { style: { textAlign: 'left', padding: '12px 14px', fontWeight: 500 } }, 'Team'),
+            cols.map(c => el('th', { key: c.key, style: thStyle(sortKey === c.key), onClick: toggle(c.key) }, c.label))
+          )),
+          el('tbody', null,
+            sorted.map((t, i) => el('tr', { key: i, style: { borderTop: '1px solid #172029' } },
+              el('td', { style: { padding: '11px 14px', fontFamily: "'IBM Plex Mono',monospace", color: '#6b7a86' } }, i + 1),
+              el('td', { style: { padding: '11px 14px', color: '#e6edf3' } }, t.name),
+              el('td', { style: { padding: '11px 14px', textAlign: 'right', fontFamily: "'IBM Plex Mono',monospace", color: '#c9d4de' } }, n(t.matches)),
+              el('td', { style: { padding: '11px 14px', textAlign: 'right', fontFamily: "'IBM Plex Mono',monospace", color: '#f2f6fa' } }, n(t.goals)),
+              el('td', { style: { padding: '11px 14px', textAlign: 'right', fontFamily: "'IBM Plex Mono',monospace", color: '#34d399' } }, t.gpmVal.toFixed(2))
+            ))
+          )
+        )
+      )
+    )
+  );
+}
+
+function App() {
+  const [tab, setTab] = useState('overview');
+  const tabs = [['overview', 'Overview'], ['leagues', 'Leagues'], ['seasons', 'Seasons'], ['teams', 'Teams']];
+
+  return el('div', { style: { minHeight: '100vh', background: 'radial-gradient(1200px 600px at 78% -8%, #12202b 0%, #0b0f14 55%)', padding: '28px 30px 60px' } },
+    el('div', { style: { maxWidth: 1180, margin: '0 auto' } },
+      el('header', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 20, paddingBottom: 22, borderBottom: '1px solid #1c2530' } },
+        el('div', null,
+          el('div', { style: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 } },
+            el('div', { style: { width: 11, height: 11, borderRadius: 3, background: '#34d399', boxShadow: '0 0 14px #34d39988' } }),
+            el('span', { style: { fontFamily: "'IBM Plex Mono',monospace", fontSize: 12, letterSpacing: '.16em', textTransform: 'uppercase', color: '#8b97a5' } }, 'Match & Betting-Market Intelligence')
+          ),
+          el('h1', { style: { fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 34, lineHeight: 1.05, letterSpacing: '-.02em' } }, 'European Football Odds & Outcomes'),
+          el('p', { style: { marginTop: 8, color: '#8b97a5', fontSize: 14.5, maxWidth: 640, lineHeight: 1.5 } },
+            'Ten seasons of top-5 league results modelled against Bet365 pricing — win rates, market margins and implied-probability edge across ',
+            el('span', { style: { color: '#c9d4de' } }, '17,937 matches'), '.')
+        ),
+        el('div', { style: { textAlign: 'right' } },
+          el('div', { style: { display: 'flex', gap: 7, justifyContent: 'flex-end', flexWrap: 'wrap', marginBottom: 12 } },
+            ['Python', 'BigQuery', 'dbt', 'SQL'].map((t, i) => el('span', { key: i, style: { fontFamily: "'IBM Plex Mono',monospace", fontSize: 11.5, color: '#a7b4c0', border: '1px solid #24303c', background: '#0f1620', padding: '5px 10px', borderRadius: 6 } }, t))
+          ),
+          el('div', { style: { fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, color: '#5f6c78', lineHeight: 1.6, textAlign: 'right' } },
+            'football-data.co.uk → BigQuery → dbt → sbi_mart', el('br'), '17,937 matches · 5 leagues · 2016–2026 · verified 2026-07-17')
+        )
+      ),
+      el('nav', { style: { display: 'flex', gap: 4, margin: '22px 0 26px', background: '#0f1620', border: '1px solid #1c2530', borderRadius: 11, padding: 5, width: 'fit-content' } },
+        tabs.map(([k, label]) => el('button', { key: k, style: tabStyle(tab === k), onClick: () => setTab(k) }, label))
+      ),
+      tab === 'overview' && el(Overview),
+      tab === 'leagues' && el(Leagues),
+      tab === 'seasons' && el(Seasons),
+      tab === 'teams' && el(Teams),
+      el('footer', { style: { marginTop: 34, paddingTop: 18, borderTop: '1px solid #1c2530', fontSize: 11.5, color: '#5f6c78', fontFamily: "'IBM Plex Mono',monospace", lineHeight: 1.6 } },
+        'Numbers verified against production mart ', el('span', { style: { color: '#8b97a5' } }, 'data-engineering-501612.sbi_mart'), ' (dbt). Odds are Bet365 closing prices; implied probabilities computed as 1/odds. Match counts reflect real season sizes (COVID 2019/20 shortfall, backlog spill into 2020/21).'
+      )
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(el(App));
+</script>
+</body>
+</html>

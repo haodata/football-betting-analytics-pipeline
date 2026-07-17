@@ -1,0 +1,208 @@
+version: 2
+
+models:
+  - name: int_team_match_log
+    description: One row per team per match (home and away perspective unpivoted from stg_matches), with points/goals from that team's point of view. Feeds int_team_form.
+    columns:
+      - name: match_id
+        description: "{{ doc('match_id') }}"
+        data_tests:
+          - not_null
+      - name: match_date
+        description: "{{ doc('match_date') }}"
+        data_tests:
+          - not_null
+      - name: league_code
+        description: "{{ doc('league_code') }}"
+      - name: league_name
+        description: "{{ doc('league_name') }}"
+      - name: season
+        description: "{{ doc('season') }}"
+      - name: team
+        description: "{{ doc('team_match_log_team') }}"
+        data_tests:
+          - not_null
+      - name: opponent
+        description: "{{ doc('team_match_log_opponent') }}"
+        data_tests:
+          - not_null
+      - name: is_home
+        description: "{{ doc('team_match_log_is_home') }}"
+      - name: goals_scored
+        description: Goals `team` scored in this match.
+        data_tests:
+          - not_null
+      - name: goals_conceded
+        description: Goals `team` conceded in this match.
+        data_tests:
+          - not_null
+      - name: points_earned
+        description: "{{ doc('team_match_log_points_earned') }}"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1, 3]
+                quote: false
+
+  - name: int_team_form
+    description: Rolling last-5-match form per team (points, avg goals scored/conceded), computed strictly from prior matches via a preceding-only window frame.
+    columns:
+      - name: match_id
+        description: "{{ doc('match_id') }}"
+        data_tests:
+          - not_null
+      - name: team
+        description: "{{ doc('team_match_log_team') }}"
+        data_tests:
+          - not_null
+      - name: match_date
+        description: "{{ doc('match_date') }}"
+        data_tests:
+          - not_null
+      - name: form_points_last5
+        description: Points earned across `team`'s last 5 matches strictly before this one. NULL/partial for a team's first few matches in the dataset.
+      - name: form_goals_scored_avg_last5
+        description: Average goals scored across `team`'s last 5 matches strictly before this one.
+      - name: form_goals_conceded_avg_last5
+        description: Average goals conceded across `team`'s last 5 matches strictly before this one.
+
+  - name: int_matches_enriched
+    description: Match-grain business metrics — CLAUDE.md's core calculations (goals, points, results, clean sheets, BTTS, over 2.5, shot accuracy, conversion rate) plus odds-implied probability/overround and rolling team form, joined in from int_team_form.
+    columns:
+      - name: match_id
+        description: "{{ doc('match_id') }}"
+        data_tests:
+          - not_null
+          - unique
+      - name: league_code
+        description: "{{ doc('league_code') }}"
+      - name: league_name
+        description: "{{ doc('league_name') }}"
+      - name: country
+        description: "{{ doc('country') }}"
+      - name: season
+        description: "{{ doc('season') }}"
+      - name: match_date
+        description: "{{ doc('match_date') }}"
+        data_tests:
+          - not_null
+      - name: match_time
+        description: "{{ doc('match_time') }}"
+      - name: home_team
+        description: "{{ doc('home_team') }}"
+      - name: away_team
+        description: "{{ doc('away_team') }}"
+      - name: referee
+        description: "{{ doc('referee') }}"
+      - name: full_time_home_goals
+        description: "{{ doc('full_time_home_goals') }}"
+        data_tests:
+          - not_null
+      - name: full_time_away_goals
+        description: "{{ doc('full_time_away_goals') }}"
+        data_tests:
+          - not_null
+      - name: full_time_result
+        description: "{{ doc('full_time_result') }}"
+      - name: home_shots
+        description: "{{ doc('home_shots') }}"
+      - name: away_shots
+        description: "{{ doc('away_shots') }}"
+      - name: home_shots_on_target
+        description: "{{ doc('home_shots_on_target') }}"
+      - name: away_shots_on_target
+        description: "{{ doc('away_shots_on_target') }}"
+      - name: bet365_home_odds
+        description: "{{ doc('bet365_home_odds') }}"
+      - name: bet365_draw_odds
+        description: "{{ doc('bet365_draw_odds') }}"
+      - name: bet365_away_odds
+        description: "{{ doc('bet365_away_odds') }}"
+      - name: total_goals
+        description: "{{ doc('total_goals') }}"
+        data_tests:
+          - not_null
+      - name: goal_difference
+        description: "{{ doc('goal_difference') }}"
+      - name: home_points
+        description: "{{ doc('home_points') }}"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1, 3]
+                quote: false
+      - name: away_points
+        description: "{{ doc('away_points') }}"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1, 3]
+                quote: false
+      - name: match_result
+        description: "{{ doc('match_result') }}"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Home Win', 'Away Win', 'Draw']
+      - name: home_win
+        description: "{{ doc('home_win') }}"
+      - name: away_win
+        description: "{{ doc('away_win') }}"
+      - name: draw
+        description: "{{ doc('draw') }}"
+      - name: home_clean_sheet
+        description: "{{ doc('home_clean_sheet') }}"
+      - name: away_clean_sheet
+        description: "{{ doc('away_clean_sheet') }}"
+      - name: both_teams_to_score
+        description: "{{ doc('both_teams_to_score') }}"
+      - name: over_2_5_goals
+        description: "{{ doc('over_2_5_goals') }}"
+      - name: home_shot_accuracy
+        description: "{{ doc('home_shot_accuracy') }}"
+      - name: away_shot_accuracy
+        description: "{{ doc('away_shot_accuracy') }}"
+      - name: home_goal_conversion_rate
+        description: "{{ doc('home_goal_conversion_rate') }}"
+      - name: away_goal_conversion_rate
+        description: "{{ doc('away_goal_conversion_rate') }}"
+      - name: implied_prob_home
+        description: "{{ doc('implied_prob_home') }}"
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+                inclusive: true
+      - name: implied_prob_draw
+        description: "{{ doc('implied_prob_draw') }}"
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+                inclusive: true
+      - name: implied_prob_away
+        description: "{{ doc('implied_prob_away') }}"
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+                inclusive: true
+      - name: bookmaker_overround
+        description: "{{ doc('bookmaker_overround') }}"
+      - name: home_form_points_last5
+        description: "{{ doc('home_form_points_last5') }}"
+      - name: home_form_goals_scored_avg_last5
+        description: "{{ doc('home_form_goals_scored_avg_last5') }}"
+      - name: home_form_goals_conceded_avg_last5
+        description: "{{ doc('home_form_goals_conceded_avg_last5') }}"
+      - name: away_form_points_last5
+        description: "{{ doc('away_form_points_last5') }}"
+      - name: away_form_goals_scored_avg_last5
+        description: "{{ doc('away_form_goals_scored_avg_last5') }}"
+      - name: away_form_goals_conceded_avg_last5
+        description: "{{ doc('away_form_goals_conceded_avg_last5') }}"

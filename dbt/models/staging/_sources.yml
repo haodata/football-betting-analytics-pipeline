@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: sbi_raw
+    schema: sbi_raw
+    description: Raw football-data.co.uk match CSVs loaded as-is, one table per league.
+    tables:
+      - name: raw_premier_league
+        description: Raw Premier League (E0) match data, all seasons 2016/17-2025/26.
+      - name: raw_bundesliga
+        description: Raw Bundesliga (D1) match data, all seasons 2016/17-2025/26.
+      - name: raw_la_liga
+        description: Raw La Liga (SP1) match data, all seasons 2016/17-2025/26.
+      - name: raw_serie_a
+        description: Raw Serie A (I1) match data, all seasons 2016/17-2025/26.
+      - name: raw_ligue1
+        description: Raw Ligue 1 (F1) match data, all seasons 2016/17-2025/26.

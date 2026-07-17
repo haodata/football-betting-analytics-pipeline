@@ -1,0 +1,480 @@
+version: 2
+
+models:
+  - name: stg_premier_league
+    description: Standardized Premier League (E0) matches — renamed/typed columns, season derived from date, league/country attached.
+    columns:
+      - name: league_code
+        description: "{{ doc('league_code') }}"
+      - name: league_name
+        description: "{{ doc('league_name') }}"
+      - name: country
+        description: "{{ doc('country') }}"
+      - name: season
+        description: "{{ doc('season') }}"
+      - name: match_date
+        description: "{{ doc('match_date') }}"
+        data_tests:
+          - not_null
+      - name: match_time
+        description: "{{ doc('match_time') }}"
+      - name: home_team
+        description: "{{ doc('home_team') }}"
+        data_tests:
+          - not_null
+      - name: away_team
+        description: "{{ doc('away_team') }}"
+        data_tests:
+          - not_null
+      - name: referee
+        description: "{{ doc('referee') }}"
+      - name: full_time_home_goals
+        description: "{{ doc('full_time_home_goals') }}"
+      - name: full_time_away_goals
+        description: "{{ doc('full_time_away_goals') }}"
+      - name: full_time_result
+        description: "{{ doc('full_time_result') }}"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['H', 'D', 'A']
+      - name: half_time_home_goals
+        description: "{{ doc('half_time_home_goals') }}"
+      - name: half_time_away_goals
+        description: "{{ doc('half_time_away_goals') }}"
+      - name: half_time_result
+        description: "{{ doc('half_time_result') }}"
+      - name: home_shots
+        description: "{{ doc('home_shots') }}"
+      - name: away_shots
+        description: "{{ doc('away_shots') }}"
+      - name: home_shots_on_target
+        description: "{{ doc('home_shots_on_target') }}"
+      - name: away_shots_on_target
+        description: "{{ doc('away_shots_on_target') }}"
+      - name: home_fouls
+        description: "{{ doc('home_fouls') }}"
+      - name: away_fouls
+        description: "{{ doc('away_fouls') }}"
+      - name: home_corners
+        description: "{{ doc('home_corners') }}"
+      - name: away_corners
+        description: "{{ doc('away_corners') }}"
+      - name: home_yellow_cards
+        description: "{{ doc('home_yellow_cards') }}"
+      - name: away_yellow_cards
+        description: "{{ doc('away_yellow_cards') }}"
+      - name: home_red_cards
+        description: "{{ doc('home_red_cards') }}"
+      - name: away_red_cards
+        description: "{{ doc('away_red_cards') }}"
+      - name: bet365_home_odds
+        description: "{{ doc('bet365_home_odds') }}"
+      - name: bet365_draw_odds
+        description: "{{ doc('bet365_draw_odds') }}"
+      - name: bet365_away_odds
+        description: "{{ doc('bet365_away_odds') }}"
+      - name: source_file
+        description: "{{ doc('source_file') }}"
+
+  - name: stg_bundesliga
+    description: Standardized Bundesliga (D1) matches — renamed/typed columns, season derived from date, league/country attached.
+    columns:
+      - name: league_code
+        description: "{{ doc('league_code') }}"
+      - name: league_name
+        description: "{{ doc('league_name') }}"
+      - name: country
+        description: "{{ doc('country') }}"
+      - name: season
+        description: "{{ doc('season') }}"
+      - name: match_date
+        description: "{{ doc('match_date') }}"
+        data_tests:
+          - not_null
+      - name: match_time
+        description: "{{ doc('match_time') }}"
+      - name: home_team
+        description: "{{ doc('home_team') }}"
+        data_tests:
+          - not_null
+      - name: away_team
+        description: "{{ doc('away_team') }}"
+        data_tests:
+          - not_null
+      - name: referee
+        description: "{{ doc('referee') }}"
+      - name: full_time_home_goals
+        description: "{{ doc('full_time_home_goals') }}"
+      - name: full_time_away_goals
+        description: "{{ doc('full_time_away_goals') }}"
+      - name: full_time_result
+        description: "{{ doc('full_time_result') }}"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['H', 'D', 'A']
+      - name: half_time_home_goals
+        description: "{{ doc('half_time_home_goals') }}"
+      - name: half_time_away_goals
+        description: "{{ doc('half_time_away_goals') }}"
+      - name: half_time_result
+        description: "{{ doc('half_time_result') }}"
+      - name: home_shots
+        description: "{{ doc('home_shots') }}"
+      - name: away_shots
+        description: "{{ doc('away_shots') }}"
+      - name: home_shots_on_target
+        description: "{{ doc('home_shots_on_target') }}"
+      - name: away_shots_on_target
+        description: "{{ doc('away_shots_on_target') }}"
+      - name: home_fouls
+        description: "{{ doc('home_fouls') }}"
+      - name: away_fouls
+        description: "{{ doc('away_fouls') }}"
+      - name: home_corners
+        description: "{{ doc('home_corners') }}"
+      - name: away_corners
+        description: "{{ doc('away_corners') }}"
+      - name: home_yellow_cards
+        description: "{{ doc('home_yellow_cards') }}"
+      - name: away_yellow_cards
+        description: "{{ doc('away_yellow_cards') }}"
+      - name: home_red_cards
+        description: "{{ doc('home_red_cards') }}"
+      - name: away_red_cards
+        description: "{{ doc('away_red_cards') }}"
+      - name: bet365_home_odds
+        description: "{{ doc('bet365_home_odds') }}"
+      - name: bet365_draw_odds
+        description: "{{ doc('bet365_draw_odds') }}"
+      - name: bet365_away_odds
+        description: "{{ doc('bet365_away_odds') }}"
+      - name: source_file
+        description: "{{ doc('source_file') }}"
+
+  - name: stg_la_liga
+    description: Standardized La Liga (SP1) matches — renamed/typed columns, season derived from date, league/country attached.
+    columns:
+      - name: league_code
+        description: "{{ doc('league_code') }}"
+      - name: league_name
+        description: "{{ doc('league_name') }}"
+      - name: country
+        description: "{{ doc('country') }}"
+      - name: season
+        description: "{{ doc('season') }}"
+      - name: match_date
+        description: "{{ doc('match_date') }}"
+        data_tests:
+          - not_null
+      - name: match_time
+        description: "{{ doc('match_time') }}"
+      - name: home_team
+        description: "{{ doc('home_team') }}"
+        data_tests:
+          - not_null
+      - name: away_team
+        description: "{{ doc('away_team') }}"
+        data_tests:
+          - not_null
+      - name: referee
+        description: "{{ doc('referee') }}"
+      - name: full_time_home_goals
+        description: "{{ doc('full_time_home_goals') }}"
+      - name: full_time_away_goals
+        description: "{{ doc('full_time_away_goals') }}"
+      - name: full_time_result
+        description: "{{ doc('full_time_result') }}"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['H', 'D', 'A']
+      - name: half_time_home_goals
+        description: "{{ doc('half_time_home_goals') }}"
+      - name: half_time_away_goals
+        description: "{{ doc('half_time_away_goals') }}"
+      - name: half_time_result
+        description: "{{ doc('half_time_result') }}"
+      - name: home_shots
+        description: "{{ doc('home_shots') }}"
+      - name: away_shots
+        description: "{{ doc('away_shots') }}"
+      - name: home_shots_on_target
+        description: "{{ doc('home_shots_on_target') }}"
+      - name: away_shots_on_target
+        description: "{{ doc('away_shots_on_target') }}"
+      - name: home_fouls
+        description: "{{ doc('home_fouls') }}"
+      - name: away_fouls
+        description: "{{ doc('away_fouls') }}"
+      - name: home_corners
+        description: "{{ doc('home_corners') }}"
+      - name: away_corners
+        description: "{{ doc('away_corners') }}"
+      - name: home_yellow_cards
+        description: "{{ doc('home_yellow_cards') }}"
+      - name: away_yellow_cards
+        description: "{{ doc('away_yellow_cards') }}"
+      - name: home_red_cards
+        description: "{{ doc('home_red_cards') }}"
+      - name: away_red_cards
+        description: "{{ doc('away_red_cards') }}"
+      - name: bet365_home_odds
+        description: "{{ doc('bet365_home_odds') }}"
+      - name: bet365_draw_odds
+        description: "{{ doc('bet365_draw_odds') }}"
+      - name: bet365_away_odds
+        description: "{{ doc('bet365_away_odds') }}"
+      - name: source_file
+        description: "{{ doc('source_file') }}"
+
+  - name: stg_serie_a
+    description: Standardized Serie A (I1) matches — renamed/typed columns, season derived from date, league/country attached.
+    columns:
+      - name: league_code
+        description: "{{ doc('league_code') }}"
+      - name: league_name
+        description: "{{ doc('league_name') }}"
+      - name: country
+        description: "{{ doc('country') }}"
+      - name: season
+        description: "{{ doc('season') }}"
+      - name: match_date
+        description: "{{ doc('match_date') }}"
+        data_tests:
+          - not_null
+      - name: match_time
+        description: "{{ doc('match_time') }}"
+      - name: home_team
+        description: "{{ doc('home_team') }}"
+        data_tests:
+          - not_null
+      - name: away_team
+        description: "{{ doc('away_team') }}"
+        data_tests:
+          - not_null
+      - name: referee
+        description: "{{ doc('referee') }}"
+      - name: full_time_home_goals
+        description: "{{ doc('full_time_home_goals') }}"
+      - name: full_time_away_goals
+        description: "{{ doc('full_time_away_goals') }}"
+      - name: full_time_result
+        description: "{{ doc('full_time_result') }}"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['H', 'D', 'A']
+      - name: half_time_home_goals
+        description: "{{ doc('half_time_home_goals') }}"
+      - name: half_time_away_goals
+        description: "{{ doc('half_time_away_goals') }}"
+      - name: half_time_result
+        description: "{{ doc('half_time_result') }}"
+      - name: home_shots
+        description: "{{ doc('home_shots') }}"
+      - name: away_shots
+        description: "{{ doc('away_shots') }}"
+      - name: home_shots_on_target
+        description: "{{ doc('home_shots_on_target') }}"
+      - name: away_shots_on_target
+        description: "{{ doc('away_shots_on_target') }}"
+      - name: home_fouls
+        description: "{{ doc('home_fouls') }}"
+      - name: away_fouls
+        description: "{{ doc('away_fouls') }}"
+      - name: home_corners
+        description: "{{ doc('home_corners') }}"
+      - name: away_corners
+        description: "{{ doc('away_corners') }}"
+      - name: home_yellow_cards
+        description: "{{ doc('home_yellow_cards') }}"
+      - name: away_yellow_cards
+        description: "{{ doc('away_yellow_cards') }}"
+      - name: home_red_cards
+        description: "{{ doc('home_red_cards') }}"
+      - name: away_red_cards
+        description: "{{ doc('away_red_cards') }}"
+      - name: bet365_home_odds
+        description: "{{ doc('bet365_home_odds') }}"
+      - name: bet365_draw_odds
+        description: "{{ doc('bet365_draw_odds') }}"
+      - name: bet365_away_odds
+        description: "{{ doc('bet365_away_odds') }}"
+      - name: source_file
+        description: "{{ doc('source_file') }}"
+
+  - name: stg_ligue1
+    description: Standardized Ligue 1 (F1) matches — renamed/typed columns, season derived from date, league/country attached.
+    columns:
+      - name: league_code
+        description: "{{ doc('league_code') }}"
+      - name: league_name
+        description: "{{ doc('league_name') }}"
+      - name: country
+        description: "{{ doc('country') }}"
+      - name: season
+        description: "{{ doc('season') }}"
+      - name: match_date
+        description: "{{ doc('match_date') }}"
+        data_tests:
+          - not_null
+      - name: match_time
+        description: "{{ doc('match_time') }}"
+      - name: home_team
+        description: "{{ doc('home_team') }}"
+        data_tests:
+          - not_null
+      - name: away_team
+        description: "{{ doc('away_team') }}"
+        data_tests:
+          - not_null
+      - name: referee
+        description: "{{ doc('referee') }}"
+      - name: full_time_home_goals
+        description: "{{ doc('full_time_home_goals') }}"
+      - name: full_time_away_goals
+        description: "{{ doc('full_time_away_goals') }}"
+      - name: full_time_result
+        description: "{{ doc('full_time_result') }}"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['H', 'D', 'A']
+      - name: half_time_home_goals
+        description: "{{ doc('half_time_home_goals') }}"
+      - name: half_time_away_goals
+        description: "{{ doc('half_time_away_goals') }}"
+      - name: half_time_result
+        description: "{{ doc('half_time_result') }}"
+      - name: home_shots
+        description: "{{ doc('home_shots') }}"
+      - name: away_shots
+        description: "{{ doc('away_shots') }}"
+      - name: home_shots_on_target
+        description: "{{ doc('home_shots_on_target') }}"
+      - name: away_shots_on_target
+        description: "{{ doc('away_shots_on_target') }}"
+      - name: home_fouls
+        description: "{{ doc('home_fouls') }}"
+      - name: away_fouls
+        description: "{{ doc('away_fouls') }}"
+      - name: home_corners
+        description: "{{ doc('home_corners') }}"
+      - name: away_corners
+        description: "{{ doc('away_corners') }}"
+      - name: home_yellow_cards
+        description: "{{ doc('home_yellow_cards') }}"
+      - name: away_yellow_cards
+        description: "{{ doc('away_yellow_cards') }}"
+      - name: home_red_cards
+        description: "{{ doc('home_red_cards') }}"
+      - name: away_red_cards
+        description: "{{ doc('away_red_cards') }}"
+      - name: bet365_home_odds
+        description: "{{ doc('bet365_home_odds') }}"
+      - name: bet365_draw_odds
+        description: "{{ doc('bet365_draw_odds') }}"
+      - name: bet365_away_odds
+        description: "{{ doc('bet365_away_odds') }}"
+      - name: source_file
+        description: "{{ doc('source_file') }}"
+
+  - name: stg_matches
+    description: Union of all 5 league staging models — single standardized matches stream, the only upstream source for intermediate/marts models.
+    columns:
+      - name: match_id
+        description: "{{ doc('match_id') }}"
+        data_tests:
+          - not_null
+          - unique
+      - name: league_code
+        description: "{{ doc('league_code') }}"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('seed_league_lookup')
+                field: league_code
+      - name: league_name
+        description: "{{ doc('league_name') }}"
+        data_tests:
+          - not_null
+      - name: country
+        description: "{{ doc('country') }}"
+        data_tests:
+          - not_null
+      - name: season
+        description: "{{ doc('season') }}"
+        data_tests:
+          - not_null
+      - name: match_date
+        description: "{{ doc('match_date') }}"
+        data_tests:
+          - not_null
+      - name: match_time
+        description: "{{ doc('match_time') }}"
+      - name: home_team
+        description: "{{ doc('home_team') }}"
+        data_tests:
+          - not_null
+      - name: away_team
+        description: "{{ doc('away_team') }}"
+        data_tests:
+          - not_null
+      - name: referee
+        description: "{{ doc('referee') }}"
+      - name: full_time_home_goals
+        description: "{{ doc('full_time_home_goals') }}"
+        data_tests:
+          - not_null
+      - name: full_time_away_goals
+        description: "{{ doc('full_time_away_goals') }}"
+        data_tests:
+          - not_null
+      - name: full_time_result
+        description: "{{ doc('full_time_result') }}"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['H', 'D', 'A']
+      - name: half_time_home_goals
+        description: "{{ doc('half_time_home_goals') }}"
+      - name: half_time_away_goals
+        description: "{{ doc('half_time_away_goals') }}"
+      - name: half_time_result
+        description: "{{ doc('half_time_result') }}"
+      - name: home_shots
+        description: "{{ doc('home_shots') }}"
+      - name: away_shots
+        description: "{{ doc('away_shots') }}"
+      - name: home_shots_on_target
+        description: "{{ doc('home_shots_on_target') }}"
+      - name: away_shots_on_target
+        description: "{{ doc('away_shots_on_target') }}"
+      - name: home_fouls
+        description: "{{ doc('home_fouls') }}"
+      - name: away_fouls
+        description: "{{ doc('away_fouls') }}"
+      - name: home_corners
+        description: "{{ doc('home_corners') }}"
+      - name: away_corners
+        description: "{{ doc('away_corners') }}"
+      - name: home_yellow_cards
+        description: "{{ doc('home_yellow_cards') }}"
+      - name: away_yellow_cards
+        description: "{{ doc('away_yellow_cards') }}"
+      - name: home_red_cards
+        description: "{{ doc('home_red_cards') }}"
+      - name: away_red_cards
+        description: "{{ doc('away_red_cards') }}"
+      - name: bet365_home_odds
+        description: "{{ doc('bet365_home_odds') }}"
+      - name: bet365_draw_odds
+        description: "{{ doc('bet365_draw_odds') }}"
+      - name: bet365_away_odds
+        description: "{{ doc('bet365_away_odds') }}"
+      - name: source_file
+        description: "{{ doc('source_file') }}"

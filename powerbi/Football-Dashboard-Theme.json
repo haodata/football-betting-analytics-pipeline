@@ -1,0 +1,126 @@
+{
+  "name": "Football Analytics Dark",
+  "dataColors": ["#34d399", "#38bdf8", "#fbbf24", "#f472b6", "#a78bfa", "#2dd4bf"],
+  "background": "#0c1319",
+  "backgroundLight": "#111a20",
+  "backgroundDark": "#070b0f",
+  "foreground": "#e6edf3",
+  "foregroundLight": "#8b97a3",
+  "foregroundDark": "#ffffff",
+  "foregroundNeutralSecondary": "#64748b",
+  "foregroundNeutralSecondaryAlt1": "#5b6875",
+  "tableAccent": "#34d399",
+  "good": "#34d399",
+  "neutral": "#fbbf24",
+  "bad": "#f472b6",
+  "maximum": "#34d399",
+  "center": "#fbbf24",
+  "minimum": "#1a2731",
+  "null": "#5b6875",
+  "textClasses": {
+    "label": { "fontFace": "Segoe UI", "color": "#8b97a3", "fontSize": 11 },
+    "callout": { "fontFace": "Segoe UI Semibold", "color": "#ffffff", "fontSize": 32 },
+    "title": { "fontFace": "Segoe UI Semibold", "color": "#e6edf3", "fontSize": 13 },
+    "header": { "fontFace": "Segoe UI Bold", "color": "#e6edf3", "fontSize": 24 }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          { "show": true, "color": { "solid": { "color": "#0c1319" } }, "transparency": 0 }
+        ],
+        "border": [
+          { "show": true, "color": { "solid": { "color": "#1a2731" } }, "radius": 16 }
+        ],
+        "outspacePane": [
+          { "backgroundColor": { "solid": { "color": "#0c1319" } } }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          { "color": { "solid": { "color": "#070b0f" } }, "transparency": 0 }
+        ]
+      }
+    },
+    "card": {
+      "*": {
+        "labels": [
+          { "color": "#ffffff", "fontSize": 32, "fontFamily": "Segoe UI Semibold" }
+        ],
+        "categoryLabels": [
+          { "color": "#8b97a3", "fontSize": 11, "fontFamily": "Segoe UI Semibold" }
+        ]
+      }
+    },
+    "lineChart": {
+      "*": {
+        "dataPoint": [
+          { "defaultColor": { "solid": { "color": "#34d399" } } }
+        ],
+        "categoryAxis": [
+          {
+            "gridlineShow": false,
+            "labelColor": { "solid": { "color": "#5b6875" } },
+            "fontFamily": "Consolas"
+          }
+        ],
+        "valueAxis": [
+          {
+            "gridlineColor": { "solid": { "color": "#1a2731" } },
+            "gridlineShow": true,
+            "labelColor": { "solid": { "color": "#5b6875" } },
+            "fontFamily": "Consolas"
+          }
+        ]
+      }
+    },
+    "columnChart": {
+      "*": {
+        "categoryAxis": [
+          {
+            "gridlineShow": false,
+            "labelColor": { "solid": { "color": "#8b97a3" } },
+            "fontFamily": "Segoe UI"
+          }
+        ],
+        "valueAxis": [
+          {
+            "gridlineColor": { "solid": { "color": "#1a2731" } },
+            "gridlineShow": true,
+            "labelColor": { "solid": { "color": "#5b6875" } },
+            "fontFamily": "Consolas"
+          }
+        ]
+      }
+    },
+    "donutChart": {
+      "*": {
+        "legend": [
+          { "labelColor": { "solid": { "color": "#e6edf3" } }, "fontFamily": "Segoe UI" }
+        ],
+        "labels": [
+          { "color": "#ffffff", "fontFamily": "Segoe UI Semibold" }
+        ]
+      }
+    },
+    "slicer": {
+      "*": {
+        "items": [
+          {
+            "fontColor": { "solid": { "color": "#8b97a3" } },
+            "background": { "solid": { "color": "#111a20" } },
+            "fontFamily": "Consolas"
+          }
+        ],
+        "selection": [
+          {
+            "selectAllCheckboxEnabled": false,
+            "singleSelect": true
+          }
+        ]
+      }
+    }
+  }
+}
